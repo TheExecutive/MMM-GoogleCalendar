@@ -203,7 +203,7 @@ calendars: [
 ]
 ```
 
-Per-calendar options: `symbol`, `color`, `name`, `symbolClass`, `titleClass`, `timeClass`, `repeatingCountTitle`, `maximumEntries`, `maximumNumberOfDays`, `pastDaysCount`, `broadcastPastEvents` and `excludedEvents`.
+Per-calendar options: `url` (an ICS/webcal link, e.g. a published Outlook calendar; give it any unique `calendarID` such as `"work"`; read every 10 minutes at most), `symbol`, `color`, `name`, `symbolClass`, `titleClass`, `timeClass`, `repeatingCountTitle`, `maximumEntries`, `maximumNumberOfDays`, `pastDaysCount`, `broadcastPastEvents` and `excludedEvents`.
 
 #### Holidays and other subscribed calendars
 

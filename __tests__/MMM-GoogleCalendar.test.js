@@ -254,3 +254,14 @@ describe('MMM-GoogleCalendar', () => {
 
   // Add more describe blocks for other pure functions if identified
 });
+
+describe('ICS calendars', () => {
+  test('fetchCalendars passes a calendar url through to the helper', () => {
+    const GCal = global.MMMGoogleCalendarInstance;
+    GCal.config = { ...GCal.defaults, ...global.config, calendars: [{ calendarID: 'work', url: 'https://example.com/c.ics', maximumNumberOfDays: 1 }] };
+    GCal.identifier = 'm1';
+    GCal.sendSocketNotification = jest.fn();
+    GCal.fetchCalendars();
+    expect(GCal.sendSocketNotification).toHaveBeenCalledWith('ADD_CALENDAR', expect.objectContaining({ calendarID: 'work', url: 'https://example.com/c.ics', maximumNumberOfDays: 1 }));
+  });
+});

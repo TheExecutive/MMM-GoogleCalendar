@@ -10,6 +10,10 @@ const {
 const fs = require("fs");
 const path = require("path");
 const Log = require("logger");
+const { fetchIcs } = require("./ics");
+
+// ICS feeds (e.g. Outlook) are read at most this often.
+const ICS_MIN_INTERVAL = 10 * 60 * 1000;
 
 const TOKEN_FILE_NAME = "token.json";
 const CREDENTIALS_FILE_NAME = "credentials.json";
@@ -68,10 +72,12 @@ module.exports = NodeHelper.create({
     const key = this.fetcherKey(payload.id, payload.calendarID);
     const params = {
       calendarID: payload.calendarID,
-      fetchInterval: payload.fetchInterval,
+      url: payload.url,
+      fetchInterval: payload.url ? Math.max(payload.fetchInterval || 0, ICS_MIN_INTERVAL) : payload.fetchInterval,
       maximumEntries: payload.maximumEntries,
       pastDaysCount: payload.pastDaysCount,
       maximumNumberOfDays: payload.maximumNumberOfDays,
+      excludedEvents: payload.excludedEvents || [],
       identifier: payload.id
     };
     const existing = this.fetchers.get(key);
@@ -347,6 +353,11 @@ module.exports = NodeHelper.create({
     const fetcher = this.fetchers.get(key);
     if (!fetcher) return;
 
+    if (fetcher.params.url) {
+      this.fetchIcsCalendar(key, fetcher);
+      return;
+    }
+
     if (!this.calendarService) {
       // The loop ends here; the next ADD_CALENDAR after re-auth restarts it.
       fetcher.active = false;
@@ -418,6 +429,23 @@ module.exports = NodeHelper.create({
         this.scheduleNextCalendarFetch(key);
       }
     );
+  },
+
+  /**
+   * Fetch a calendar published as an ICS link and schedule the next fetch.
+   * On failure the last good events stay on screen.
+   */
+  fetchIcsCalendar: async function (key, fetcher) {
+    const { url, calendarID, maximumEntries, maximumNumberOfDays, excludedEvents, identifier } = fetcher.params;
+    try {
+      const events = await fetchIcs(url, { maximumEntries, maximumNumberOfDays, excludedEvents });
+      Log.info(`${this.name}: ${events.length} events loaded for ${calendarID} (ICS)`);
+      fetcher.events = events;
+      this.broadcastEvents(events, identifier, calendarID);
+    } catch (err) {
+      Log.error(`${this.name}: could not fetch ICS calendar ${calendarID}: ${err.message}`);
+    }
+    this.scheduleNextCalendarFetch(key);
   },
 
   scheduleNextCalendarFetch: function (key) {

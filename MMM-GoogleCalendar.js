@@ -635,6 +635,7 @@ Module.register("MMM-GoogleCalendar", {
 		maximumNumberOfDays: calendar.maximumNumberOfDays,
 		broadcastPastEvents: calendar.broadcastPastEvents,
 		excludedEvents: calendar.excludedEvents,
+		url: calendar.url,
       };
 
       if (
@@ -880,6 +881,7 @@ Module.register("MMM-GoogleCalendar", {
     this.sendSocketNotification("ADD_CALENDAR", {
       id: this.identifier,
       calendarID,
+      url: calendarConfig.url,
       excludedEvents:
         calendarConfig.excludedEvents || this.config.excludedEvents,
       maximumEntries:
