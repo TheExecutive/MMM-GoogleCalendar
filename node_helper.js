@@ -438,7 +438,7 @@ module.exports = NodeHelper.create({
   fetchIcsCalendar: async function (key, fetcher) {
     const { url, calendarID, maximumEntries, maximumNumberOfDays, excludedEvents, identifier } = fetcher.params;
     try {
-      const events = await fetchIcs(url, { maximumEntries, maximumNumberOfDays, excludedEvents });
+      const events = await fetchIcs(url, { maximumEntries, maximumNumberOfDays, excludedEvents, pastDaysCount: fetcher.params.pastDaysCount });
       Log.info(`${this.name}: ${events.length} events loaded for ${calendarID} (ICS)`);
       fetcher.events = events;
       this.broadcastEvents(events, identifier, calendarID);

@@ -24,10 +24,12 @@ function toGoogleItems(events, maxResults) {
   });
 }
 
-async function fetchIcs(url, { maximumEntries, maximumNumberOfDays = 365, excludedEvents = [] } = {}) {
+async function fetchIcs(url, { maximumEntries, maximumNumberOfDays = 365, excludedEvents = [], pastDaysCount = 0 } = {}) {
   const res = await fetch(url.replace(/^webcal:/i, "https:"), { signal: AbortSignal.timeout(30000) });
   if (!res.ok) throw new Error(`ICS HTTP ${res.status}`);
-  const config = { maximumNumberOfDays, excludedEvents, includePastEvents: false };
+  // MagicMirror's parser uses one window for both directions, so past days reach back
+  // max(pastDaysCount, maximumNumberOfDays) when pastDaysCount is set.
+  const config = { maximumNumberOfDays: Math.max(maximumNumberOfDays, pastDaysCount), excludedEvents, includePastEvents: pastDaysCount > 0 };
   let raw = await res.text();
   try {
     raw = await CalendarFetcherUtils.preFilterICS(raw, config); // speed-up only

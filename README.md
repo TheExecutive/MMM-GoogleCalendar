@@ -203,7 +203,7 @@ calendars: [
 ]
 ```
 
-Per-calendar options: `listDays` (list only this many days of the calendar, while still loading `maximumNumberOfDays` for other modules), `url` (an ICS/webcal link, e.g. a published Outlook calendar; give it any unique `calendarID` such as `"work"`; read every 10 minutes at most), `symbol`, `color`, `name`, `symbolClass`, `titleClass`, `timeClass`, `repeatingCountTitle`, `maximumEntries`, `maximumNumberOfDays`, `pastDaysCount`, `broadcastPastEvents` and `excludedEvents`.
+Module option `hideEndedInList` keeps finished events out of the list when `pastDaysCount` loads them (e.g. for a month view). Per-calendar options: `pastDaysCount`, `listDays` (list only this many days of the calendar, while still loading `maximumNumberOfDays` for other modules), `url` (an ICS/webcal link, e.g. a published Outlook calendar; give it any unique `calendarID` such as `"work"`; read every 10 minutes at most), `symbol`, `color`, `name`, `symbolClass`, `titleClass`, `timeClass`, `repeatingCountTitle`, `maximumEntries`, `maximumNumberOfDays`, `pastDaysCount`, `broadcastPastEvents` and `excludedEvents`.
 
 #### Holidays and other subscribed calendars
 

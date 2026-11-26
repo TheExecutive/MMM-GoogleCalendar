@@ -62,6 +62,7 @@ Module.register("MMM-GoogleCalendar", {
     sliceMultiDayEvents: false,
     nextDaysRelative: false,
 	broadcastPastEvents: false,
+    hideEndedInList: false, // keep finished events out of the list even when pastDaysCount loads them (e.g. for a month view)
   },
 
   requiresVersion: "2.1.0",
@@ -636,6 +637,7 @@ Module.register("MMM-GoogleCalendar", {
 		broadcastPastEvents: calendar.broadcastPastEvents,
 		excludedEvents: calendar.excludedEvents,
 		url: calendar.url,
+		pastDaysCount: calendar.pastDaysCount,
       };
 
       if (
@@ -763,6 +765,9 @@ Module.register("MMM-GoogleCalendar", {
 
         // Per-calendar `listDays`: show only this many days of it in the list, while
         // still loading (and broadcasting) more for other modules such as month views.
+        if (this.config.hideEndedInList && event.endDate !== null && event.endDate <= now.getTime()) {
+          continue;
+        }
         const listDays = this.calendarConfig(calendarID)?.listDays;
         if (listDays > 0 && event.startDate >= today.clone().add(listDays, "days").valueOf()) {
           continue;

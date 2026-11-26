@@ -80,3 +80,10 @@ test("repeating meetings are flagged so month dots can skip them", async () => {
   expect(items.find(i => i.summary === "IS Team Standup").recurringEventId).toBeTruthy();
   expect(items.find(i => i.summary === "Day off").recurringEventId).toBeUndefined();
 });
+
+test("pastDaysCount loads earlier meetings too", async () => {
+  const upcoming = await fetchIcs("https://x/c.ics", { maximumEntries: 50, maximumNumberOfDays: 7 });
+  const withPast = await fetchIcs("https://x/c.ics", { maximumEntries: 50, maximumNumberOfDays: 7, pastDaysCount: 7 });
+  expect(upcoming.some(i => (i.start.dateTime || "").startsWith("2026-11-23"))).toBe(false);
+  expect(withPast.some(i => (i.start.dateTime || "").startsWith("2026-11-23"))).toBe(true);
+});

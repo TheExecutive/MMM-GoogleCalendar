@@ -265,3 +265,14 @@ describe('ICS calendars', () => {
     expect(GCal.sendSocketNotification).toHaveBeenCalledWith('ADD_CALENDAR', expect.objectContaining({ calendarID: 'work', url: 'https://example.com/c.ics', maximumNumberOfDays: 1 }));
   });
 });
+
+describe('Past events for month views', () => {
+  test('per-calendar pastDaysCount reaches the helper', () => {
+    const GCal = global.MMMGoogleCalendarInstance;
+    GCal.config = { ...GCal.defaults, ...global.config, calendars: [{ calendarID: 'me', pastDaysCount: 31 }] };
+    GCal.identifier = 'm1';
+    GCal.sendSocketNotification = jest.fn();
+    GCal.fetchCalendars();
+    expect(GCal.sendSocketNotification).toHaveBeenCalledWith('ADD_CALENDAR', expect.objectContaining({ calendarID: 'me', pastDaysCount: 31 }));
+  });
+});
