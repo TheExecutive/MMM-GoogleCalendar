@@ -33,7 +33,11 @@ async function fetchIcs(url, { maximumEntries, maximumNumberOfDays = 365, exclud
   } catch {
     // keep the full feed
   }
-  return toGoogleItems(CalendarFetcherUtils.filterEvents(ical.sync.parseICS(raw), config), maximumEntries);
+  // filterEvents checks a series' own title; changed single meetings (e.g. Outlook's
+  // "Canceled: ...") carry their own title, so check every meeting again.
+  const events = CalendarFetcherUtils.filterEvents(ical.sync.parseICS(raw), config)
+    .filter(e => !CalendarFetcherUtils.shouldEventBeExcluded(config, e.title).excluded);
+  return toGoogleItems(events, maximumEntries);
 }
 
 module.exports = { fetchIcs, toGoogleItems };

@@ -28,6 +28,13 @@ EXDATE;TZID=Eastern Standard Time:20261127T093000
 LOCATION:Microsoft Teams Meeting
 END:VEVENT
 BEGIN:VEVENT
+UID:standup
+RECURRENCE-ID;TZID=Eastern Standard Time:20261201T093000
+SUMMARY:Canceled: IS Team Standup
+DTSTART;TZID=Eastern Standard Time:20261201T093000
+DTEND;TZID=Eastern Standard Time:20261201T094500
+END:VEVENT
+BEGIN:VEVENT
 UID:off
 SUMMARY:Day off
 DTSTART;VALUE=DATE:20261130
@@ -58,4 +65,12 @@ test("respects maximumEntries and reports HTTP failures", async () => {
 
 test("private events are marked private", () => {
   expect(toGoogleItems([{ title: "x", startDate: "0", endDate: "1", fullDayEvent: false, class: "PRIVATE" }], 5)[0].visibility).toBe("private");
+});
+
+test("exclusions also apply to single changed meetings in a series (Outlook cancellations)", async () => {
+  const all = await fetchIcs("https://x/c.ics", { maximumEntries: 50, maximumNumberOfDays: 7 });
+  expect(all.some(i => i.summary === "Canceled: IS Team Standup")).toBe(true);
+  const kept = await fetchIcs("https://x/c.ics", { maximumEntries: 50, maximumNumberOfDays: 7, excludedEvents: [{ filterBy: "^Cancel+ed:", regex: true }] });
+  expect(kept.some(i => i.summary.startsWith("Canceled"))).toBe(false);
+  expect(kept.filter(i => i.summary === "IS Team Standup").length).toBe(all.filter(i => i.summary === "IS Team Standup").length);
 });
