@@ -724,6 +724,10 @@ Module.register("MMM-GoogleCalendar", {
    *
    * @returns {object[]} Array with events.
    */
+  calendarConfig: function (calendarID) {
+    return (this.config.calendars || []).find(c => c.calendarID === calendarID);
+  },
+
   createEventList: function () {
     const now = new Date();
     const today = moment().startOf("day");
@@ -756,6 +760,13 @@ Module.register("MMM-GoogleCalendar", {
         event.calendarID = calendarID;
         event.endDate = this.extractCalendarDate(event.end);
         event.startDate = this.extractCalendarDate(event.start);
+
+        // Per-calendar `listDays`: show only this many days of it in the list, while
+        // still loading (and broadcasting) more for other modules such as month views.
+        const listDays = this.calendarConfig(calendarID)?.listDays;
+        if (listDays > 0 && event.startDate >= today.clone().add(listDays, "days").valueOf()) {
+          continue;
+        }
 
         // Call filterEvent to determine if the event should be excluded based on various settings.
         // The 'events' array (eventsList in filterEvent) is the accumulating list of events

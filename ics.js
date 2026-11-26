@@ -15,6 +15,7 @@ function toGoogleItems(events, maxResults) {
       id: `ics-${e.startDate}-${i}`,
       status: "confirmed",
       summary: e.title,
+      recurringEventId: e.recurringEvent ? `ics-series-${e.title}` : undefined,
       location: e.location || undefined,
       start: when(start),
       end: when(end),

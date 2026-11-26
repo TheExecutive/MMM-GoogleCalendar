@@ -74,3 +74,9 @@ test("exclusions also apply to single changed meetings in a series (Outlook canc
   expect(kept.some(i => i.summary.startsWith("Canceled"))).toBe(false);
   expect(kept.filter(i => i.summary === "IS Team Standup").length).toBe(all.filter(i => i.summary === "IS Team Standup").length);
 });
+
+test("repeating meetings are flagged so month dots can skip them", async () => {
+  const items = await fetchIcs("https://x/c.ics", { maximumEntries: 50, maximumNumberOfDays: 7 });
+  expect(items.find(i => i.summary === "IS Team Standup").recurringEventId).toBeTruthy();
+  expect(items.find(i => i.summary === "Day off").recurringEventId).toBeUndefined();
+});
